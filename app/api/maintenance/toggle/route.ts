@@ -24,7 +24,5 @@ export async function POST(req: NextRequest) {
   } else {
     res.cookies.set("maintenance_on", "", { ...cookieOpts, maxAge: 0 });
   }
-  // Always keep bypass cookie so admin stays unblocked
-  res.cookies.set("maintenance_bypass", BYPASS_TOKEN, cookieOpts);
   return res;
 }
