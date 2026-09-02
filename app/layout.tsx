@@ -37,7 +37,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const siteName = c.nameAr || "لمسه لبيع الشرائح";
   const titleDefault = `${siteName} | أفضل متجر لبيع شرائح الاتصال في السعودية`;
   const description = c.details || "لمسه لبيع الشرائح - تسوق أفضل شرائح الاتصال وباقات الإنترنت من فيرجن وSTC وزين وموبايلي بأسعار مميزة. توصيل سريع لجميع مناطق المملكة العربية السعودية.";
-  const ogImage = `${SITE_URL}/og-image.jpg`;
+  const ogImage = `${SITE_URL}/logo.webp`;
 
   return {
     metadataBase: new URL(SITE_URL),
@@ -78,7 +78,7 @@ export async function generateMetadata(): Promise<Metadata> {
       title: titleDefault,
       description,
       images: [
-        { url: ogImage, width: 1200, height: 630, alt: siteName, type: "image/jpeg" },
+        { url: ogImage, width: 1200, height: 630, alt: siteName, type: "image/webp" },
         { url: `${SITE_URL}/web-app-manifest-512x512.png`, width: 512, height: 512, alt: siteName, type: "image/png" },
       ],
     },
