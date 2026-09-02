@@ -28,7 +28,7 @@ export function middleware(request: NextRequest) {
   if (maintenanceMode) {
     const allowed = ['/maintenance', '/maint-mohasa', '/api/maintenance', '/api/admin/login', '/api/admin/logout', '/api/admin/verify'];
     const isAllowed = allowed.some(p => pathname.startsWith(p));
-    const isStatic = pathname.startsWith('/_next') || pathname.startsWith('/favicon') || pathname.startsWith('/site.webmanifest');
+    const isStatic = pathname.startsWith('/_next') || pathname.startsWith('/favicon') || pathname.startsWith('/site.webmanifest') || pathname.startsWith('/api/');
 
     if (!isAllowed && !isStatic) {
       const bypassCookie = request.cookies.get(MAINTENANCE_COOKIE)?.value;
