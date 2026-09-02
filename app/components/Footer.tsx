@@ -41,7 +41,8 @@ export default async function Footer() {
 
   function getHref(item: { linkType: string; link: string; file: string }) {
     if (item.file) return toInlineUrl(item.file);
-    return item.linkType === "link" ? ensureAbsolute(item.link) : toInlineUrl(item.file);
+    if (item.linkType === "link" && item.link) return ensureAbsolute(item.link);
+    return "";
   }
 
   const hasImages = qrSrc || footerItems.length > 0 || img1 || img2;

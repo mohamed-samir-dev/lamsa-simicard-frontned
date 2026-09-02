@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const BYPASS_TOKEN = process.env.MAINTENANCE_BYPASS_TOKEN || 'sahlnaha_bypass_2025';
+const BYPASS_TOKEN = process.env.MAINTENANCE_BYPASS_TOKEN;
 const MAINTENANCE_COOKIE = 'maintenance_bypass';
 const MAINTENANCE_ON_COOKIE = 'maintenance_on';
 
@@ -17,7 +17,7 @@ export function middleware(request: NextRequest) {
 
     if (!isAllowed && !isStatic) {
       const bypassCookie = request.cookies.get(MAINTENANCE_COOKIE)?.value;
-      if (bypassCookie !== BYPASS_TOKEN) {
+      if (bypassCookie !== BYPASS_TOKEN || !BYPASS_TOKEN) {
         const maintenanceUrl = new URL('/maintenance', request.url);
         const response = NextResponse.redirect(maintenanceUrl);
         response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');

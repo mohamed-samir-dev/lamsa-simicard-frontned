@@ -1,11 +1,17 @@
 "use client";
-
-const WHATSAPP_NUMBER = "966583054073";
+import { useEffect } from "react";
+import { useCompanyStore } from "../store/companyStore";
 
 export default function WhatsappButton() {
+  const { whatsapp, fetchCompany } = useCompanyStore();
+
+  useEffect(() => { fetchCompany(); }, [fetchCompany]);
+
+  const number = whatsapp ? whatsapp.replace(/\D/g, "") : "966583054073";
+
   return (
     <a
-      href={`https://wa.me/${WHATSAPP_NUMBER}`}
+      href={`https://wa.me/${number}`}
       target="_blank"
       rel="noopener noreferrer"
       className="fixed bottom-6 right-10 z-50 bg-green-500 hover:bg-green-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg transition-colors"

@@ -12,7 +12,7 @@ const SITE_URL = "https://basmathatify.com";
 
 async function getCompany() {
   try {
-    const r = await fetch(`${BACKEND}/api/admin/company`, {
+    const r = await fetch(`${BACKEND}/api/admin/company/public`, {
       next: { revalidate: 3600 },
       signal: AbortSignal.timeout(2000),
     });

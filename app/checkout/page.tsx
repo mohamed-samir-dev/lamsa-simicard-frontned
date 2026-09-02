@@ -178,7 +178,7 @@ export default function CheckoutPage() {
       <div className="relative w-full max-w-4xl bg-white border border-gray-100" dir="rtl">
         <div className="flex flex-row items-center px-4 py-3 gap-3">
           <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full overflow-hidden shrink-0 border border-gray-100">
-            <Image src="/logo.jpeg" alt="logo" width={64} height={64} className="object-contain w-full h-full" />
+            <Image src="/logo.webp" alt="logo" width={64} height={64} className="object-contain w-full h-full" />
           </div>
           <div className="flex-1 flex flex-col gap-2">
             <p className="text-sm sm:text-base font-black text-[#0A1C29]">إجمالي الطلب</p>
