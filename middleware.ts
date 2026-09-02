@@ -4,9 +4,24 @@ import type { NextRequest } from 'next/server';
 const BYPASS_TOKEN = process.env.MAINTENANCE_BYPASS_TOKEN || 'sahlnaha_bypass_2025';
 const MAINTENANCE_COOKIE = 'maintenance_bypass';
 const MAINTENANCE_ON_COOKIE = 'maintenance_on';
+// الدومين بتاعك — يعدي دايماً بدون صيانة
+const ADMIN_HOST = process.env.ADMIN_HOST || 'lamsa-simicard-backend-production.up.railway.app';
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { pathname, hostname } = request.nextUrl;
+
+  // لو الريكوست جاي من دومين الأدمن، يعدي عادي بدون أي قيود
+  if (hostname === ADMIN_HOST) {
+    const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
+    const isDev = process.env.NODE_ENV === 'development';
+    const cspHeader = buildCsp(nonce, isDev);
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-nonce', nonce);
+    requestHeaders.set('Content-Security-Policy', cspHeader);
+    const response = NextResponse.next({ request: { headers: requestHeaders } });
+    setSecurityHeaders(response, cspHeader);
+    return response;
+  }
 
   const maintenanceMode = request.cookies.get(MAINTENANCE_ON_COOKIE)?.value === '1';
 
@@ -30,7 +45,25 @@ export function middleware(request: NextRequest) {
   
   const isDev = process.env.NODE_ENV === 'development';
 
-  const cspHeader = `
+  const cspHeader = buildCsp(nonce, isDev);
+
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-nonce', nonce);
+  requestHeaders.set('Content-Security-Policy', cspHeader);
+
+  const response = NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
+
+  setSecurityHeaders(response, cspHeader);
+
+  return response;
+}
+
+function buildCsp(nonce: string, isDev: boolean): string {
+  return `
     default-src 'self';
     script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''} https://maps.googleapis.com https://js.sentry-cdn.com https://www.google-analytics.com https://www.googletagmanager.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
@@ -44,25 +77,15 @@ export function middleware(request: NextRequest) {
     frame-ancestors 'none';
     upgrade-insecure-requests;
   `.replace(/\s{2,}/g, ' ').trim();
+}
 
-  const requestHeaders = new Headers(request.headers);
-  requestHeaders.set('x-nonce', nonce);
-  requestHeaders.set('Content-Security-Policy', cspHeader);
-
-  const response = NextResponse.next({
-    request: {
-      headers: requestHeaders,
-    },
-  });
-
-  response.headers.set('Content-Security-Policy', cspHeader);
+function setSecurityHeaders(response: ReturnType<typeof NextResponse.next>, csp: string) {
+  response.headers.set('Content-Security-Policy', csp);
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('X-Frame-Options', 'DENY');
   response.headers.set('X-XSS-Protection', '1; mode=block');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(self)');
-
-  return response;
 }
 
 export const config = {

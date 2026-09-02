@@ -58,8 +58,8 @@ export default async function Footer() {
           {/* Brand */}
           <div className="flex flex-col gap-4">
             <Image src="/logo-re.webp" alt="logo" width={72} height={72} className="object-contain" />
-            <p className="text-sm leading-7 text-gray-600">
-              شرائح اتصال وإنترنت بأسعار منافسة، مع خدمة سريعة وآمنة ودعم عملاء مميز. ثقتكم غايتنا وخدمتكم أولويتنا
+            <p className="text-sm leading-7 text-gray-600 whitespace-pre-line">
+              {c.details || "شرائح اتصال وإنترنت بأسعار منافسة، مع خدمة سريعة وآمنة ودعم عملاء مميز. ثقتكم غايتنا وخدمتكم أولويتنا"}
             </p>
             <div className="flex flex-col gap-2">
               <a href="https://qr.saudibusiness.gov.sa/viewcr?nCrNumber=qjCeot5eoqF+DgXufLJovw==" target="_blank" rel="noreferrer"
@@ -84,9 +84,7 @@ export default async function Footer() {
           {/* Contact details */}
           <div className="flex flex-col gap-4">
             <h3 className="text-base font-bold text-black">تواصل معنا</h3>
-            {c.details && (
-              <p className="text-sm leading-7 text-gray-600 whitespace-pre-line">{c.details}</p>
-            )}
+
             <ul className="flex flex-col gap-3">
               {c.whatsapp && (
                 <li>
