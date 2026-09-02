@@ -62,7 +62,7 @@ export default async function Footer() {
               {c.details || "شرائح اتصال وإنترنت بأسعار منافسة، مع خدمة سريعة وآمنة ودعم عملاء مميز. ثقتكم غايتنا وخدمتكم أولويتنا"}
             </p>
             <div className="flex flex-col gap-2">
-              <a href="https://qr.saudibusiness.gov.sa/viewcr?nCrNumber=qjCeot5eoqF+DgXufLJovw==" target="_blank" rel="noreferrer"
+              <a href="https://qr.saudibusiness.gov.sa/viewcr?nCrNumber=qkDdLTB2Uy+Be+pn809n2w==" target="_blank" rel="noreferrer"
                 className="flex items-center gap-2 group">
                 <Image src="/commerce.webp" alt="سجل تجاري" width={36} height={36} className="object-contain rounded-md shrink-0" />
                 <div className="flex flex-col">
