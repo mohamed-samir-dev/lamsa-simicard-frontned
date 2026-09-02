@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function MaintenanceControl() {
   const [authed, setAuthed] = useState(false);
@@ -11,6 +12,7 @@ export default function MaintenanceControl() {
   const [loginLoading, setLoginLoading] = useState(false);
   const [toggleLoading, setToggleLoading] = useState(false);
   const [msg, setMsg] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     fetch("/api/maintenance/status", { credentials: "include" }).then(async (r) => {
@@ -60,6 +62,7 @@ export default function MaintenanceControl() {
     if (data.success) {
       setMaintenance(data.maintenance);
       setMsg(data.maintenance ? "✅ وضع الصيانة مفعّل" : "✅ الموقع شغّال الآن");
+      router.refresh();
     } else {
       setMsg("❌ " + (data.error || "حدث خطأ"));
     }
