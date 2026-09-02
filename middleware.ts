@@ -1,38 +1,37 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const BYPASS_TOKEN = process.env.MAINTENANCE_BYPASS_TOKEN || 'sahlnaha_bypass_2025';
-const MAINTENANCE_COOKIE = 'maintenance_bypass';
-const MAINTENANCE_ON_COOKIE = 'maintenance_on';
-// الدومين بتاعك — يعدي دايماً بدون صيانة
-const ADMIN_HOST = process.env.ADMIN_HOST || 'lamsa-simicard-backend-production.up.railway.app';
+// الدومين الأصلي — بيطبق عليه الصيانة
+const PUBLIC_HOST = process.env.PUBLIC_HOST || 'basmathatify.com';
+// الدومين الخاص بيك — يعدي دايماً بدون صيانة
+const ADMIN_HOST = process.env.ADMIN_HOST || 'lamsa-simicard-frontned-production.up.railway.app';
 
 export function middleware(request: NextRequest) {
   const { pathname, hostname } = request.nextUrl;
 
-  // لو الريكوست جاي من دومين الأدمن، يعدي عادي بدون أي قيود
-  if (hostname === ADMIN_HOST) {
-    const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
-    const isDev = process.env.NODE_ENV === 'development';
-    const cspHeader = buildCsp(nonce, isDev);
-    const requestHeaders = new Headers(request.headers);
-    requestHeaders.set('x-nonce', nonce);
-    requestHeaders.set('Content-Security-Policy', cspHeader);
+  const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
+  const isDev = process.env.NODE_ENV === 'development';
+  const cspHeader = buildCsp(nonce, isDev);
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-nonce', nonce);
+  requestHeaders.set('Content-Security-Policy', cspHeader);
+
+  // دومين Railway الخاص بيك — يعدي دايماً بدون صيانة
+  if (hostname === ADMIN_HOST || hostname === 'localhost') {
     const response = NextResponse.next({ request: { headers: requestHeaders } });
     setSecurityHeaders(response, cspHeader);
     return response;
   }
 
-  const maintenanceMode = request.cookies.get(MAINTENANCE_ON_COOKIE)?.value === '1';
+  // الدومين الأصلي basmathatify.com — بيطبق الصيانة
+  if (hostname === PUBLIC_HOST) {
+    const maintenanceMode = request.cookies.get('maintenance_on')?.value === '1';
 
-  if (maintenanceMode) {
-    const allowed = ['/maintenance', '/maint-mohasa', '/api/maintenance', '/api/admin/login', '/api/admin/logout', '/api/admin/verify'];
-    const isAllowed = allowed.some(p => pathname.startsWith(p));
-    const isStatic = pathname.startsWith('/_next') || pathname.startsWith('/favicon') || pathname.startsWith('/site.webmanifest') || pathname.startsWith('/api/');
+    if (maintenanceMode) {
+      const isStatic = pathname.startsWith('/_next') || pathname.startsWith('/favicon') || pathname.startsWith('/site.webmanifest');
+      const isAllowed = pathname.startsWith('/maintenance') || pathname.startsWith('/api/');
 
-    if (!isAllowed && !isStatic) {
-      const bypassCookie = request.cookies.get(MAINTENANCE_COOKIE)?.value;
-      if (bypassCookie !== BYPASS_TOKEN) {
+      if (!isStatic && !isAllowed) {
         const maintenanceUrl = new URL('/maintenance', request.url);
         const response = NextResponse.redirect(maintenanceUrl);
         response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
@@ -41,24 +40,8 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
-  
-  const isDev = process.env.NODE_ENV === 'development';
-
-  const cspHeader = buildCsp(nonce, isDev);
-
-  const requestHeaders = new Headers(request.headers);
-  requestHeaders.set('x-nonce', nonce);
-  requestHeaders.set('Content-Security-Policy', cspHeader);
-
-  const response = NextResponse.next({
-    request: {
-      headers: requestHeaders,
-    },
-  });
-
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
   setSecurityHeaders(response, cspHeader);
-
   return response;
 }
 
@@ -90,13 +73,6 @@ function setSecurityHeaders(response: ReturnType<typeof NextResponse.next>, csp:
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
     {
       source: '/((?!api|_next/static|_next/image|favicon.ico).*)',
       missing: [
