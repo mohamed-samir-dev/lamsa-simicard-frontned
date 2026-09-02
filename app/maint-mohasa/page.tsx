@@ -62,7 +62,7 @@ export default function MaintenanceControl() {
     if (data.success) {
       setMaintenance(data.maintenance);
       setMsg(data.maintenance ? "✅ وضع الصيانة مفعّل" : "✅ الموقع شغّال الآن");
-      setTimeout(() => window.location.reload(), 800);
+      setTimeout(() => window.location.reload(), 1500);
     } else {
       setMsg("❌ " + (data.error || "حدث خطأ"));
     }
