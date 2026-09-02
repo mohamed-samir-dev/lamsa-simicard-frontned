@@ -75,6 +75,7 @@ export default async function Footer() {
                 <Image src="/work.webp" alt="شهادة توثيق" width={36} height={36} className="object-contain rounded-md shrink-0" />
                 <div className="flex flex-col">
                   <span className="text-xs font-semibold text-black group-hover:underline">شهادة توثيق</span>
+                  <span className="text-xs text-gray-500">مركز الاعمال</span>
                   <span className="text-xs text-gray-500 font-mono">0000315375</span>
                 </div>
               </a>
