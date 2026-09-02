@@ -72,12 +72,12 @@ export default function ProductPageClient({ id }: { id: string }) {
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.back()}
-              className="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 text-gray-600 hover:border-[#63D3A8] hover:text-[#63D3A8] transition bg-gray-50"
+              className="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 text-gray-600 hover:border-[#B5854A] hover:text-[#B5854A] transition bg-gray-50"
             >
               <IoArrowForward size={17} />
             </button>
             <nav className="hidden sm:flex items-center gap-1.5 text-xs text-gray-400">
-              <Link href="/" className="hover:text-[#63D3A8] transition flex items-center gap-1">
+              <Link href="/" className="hover:text-[#B5854A] transition flex items-center gap-1">
                 <IoHomeOutline size={12} />
                 الرئيسية
               </Link>
@@ -88,12 +88,12 @@ export default function ProductPageClient({ id }: { id: string }) {
                   <IoChevronBack size={10} />
                 </>
               )}
-              <span className="text-[#63D3A8] font-bold truncate max-w-[180px]">{product.name}</span>
+              <span className="text-[#B5854A] font-bold truncate max-w-[180px]">{product.name}</span>
             </nav>
           </div>
           <button
             onClick={handleShare}
-            className="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 text-gray-600 hover:border-[#63D3A8] hover:text-[#63D3A8] transition bg-gray-50"
+            className="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 text-gray-600 hover:border-[#B5854A] hover:text-[#B5854A] transition bg-gray-50"
           >
             <IoShareSocial size={15} />
           </button>
@@ -129,7 +129,7 @@ export default function ProductPageClient({ id }: { id: string }) {
           <div className="flex items-center justify-between mb-2">
             <p className="text-xs text-gray-400 truncate flex-1 ml-3">{product.name}</p>
             <div className="flex items-baseline gap-1">
-              <span className="text-xl font-black text-[#63D3A8]">{finalPrice.toLocaleString("en-US")}</span>
+              <span className="text-xl font-black text-[#B5854A]">{finalPrice.toLocaleString("en-US")}</span>
               <span className="text-xs text-gray-400"><img src="/money-icon.webp" alt="ر.س" className="inline w-6 h-6 object-contain align-middle" /></span>
             </div>
           </div>

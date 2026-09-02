@@ -56,33 +56,37 @@ export default async function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
 
           {/* Brand */}
-          <div className="flex flex-col gap-4">
-            <h2 className="text-lg font-bold text-black">مسار الجوال</h2>
+          <div className="flex flex-col gap-5">
+            <Image src="/logo-re.webp" alt="logo" width={90} height={90} className="object-contain" />
             <p className="text-sm leading-7 text-gray-600">
               شرائح اتصال وإنترنت بأسعار منافسة، مع خدمة سريعة وآمنة ودعم عملاء مميز. ثقتكم غايتنا وخدمتكم أولويتنا
             </p>
-            {/* Commercial Register */}
-            <a href="https://qr.saudibusiness.gov.sa/viewcr?nCrNumber=qjCeot5eoqF+DgXufLJovw==" target="_blank" rel="noreferrer" className="flex items-center gap-3">
-              <Image src="/commerce.webp" alt="سجل تجاري" width={48} height={48} className="object-contain" />
-              <div className="flex flex-col">
-                <span className="text-base font-semibold text-black">السجل التجاري</span>
-                <span className="text-sm text-gray-600">314781690600003</span>
-              </div>
-            </a>
-            <a href="https://eauthenticate.saudibusiness.gov.sa/inquiry" target="_blank" rel="noreferrer" className="flex items-center gap-3">
-              <Image src="/work.webp" alt="شهادة توثيق" width={48} height={48} className="object-contain" />
-              <div className="flex flex-col">
-                <span className="text-base font-semibold text-black">شهادة توثيق</span>
-                <span className="text-sm text-gray-600">مركز الاعمال</span>
-                <span className="text-sm text-gray-600">0000322450</span>
-              </div>
-            </a>
-           
+            <div className="flex flex-col gap-3">
+              <a href="https://qr.saudibusiness.gov.sa/viewcr?nCrNumber=qjCeot5eoqF+DgXufLJovw==" target="_blank" rel="noreferrer"
+                className="flex items-center gap-3 group">
+                <Image src="/commerce.webp" alt="سجل تجاري" width={44} height={44} className="object-contain rounded-lg" />
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold text-black group-hover:underline">السجل التجاري</span>
+                  <span className="text-xs text-gray-500 font-mono">7054930313</span>
+                </div>
+              </a>
+              <a href="https://eauthenticate.saudibusiness.gov.sa/inquiry" target="_blank" rel="noreferrer"
+                className="flex items-center gap-3 group">
+                <Image src="/work.webp" alt="شهادة توثيق" width={44} height={44} className="object-contain rounded-lg" />
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold text-black group-hover:underline">شهادة توثيق</span>
+                  <span className="text-xs text-gray-500 font-mono">0000315375</span>
+                </div>
+              </a>
+            </div>
           </div>
 
           {/* Contact details */}
           <div className="flex flex-col gap-4">
             <h3 className="text-base font-bold text-black">تواصل معنا</h3>
+            {c.details && (
+              <p className="text-sm leading-7 text-gray-600 whitespace-pre-line">{c.details}</p>
+            )}
             <ul className="flex flex-col gap-3">
               {c.whatsapp && (
                 <li>
