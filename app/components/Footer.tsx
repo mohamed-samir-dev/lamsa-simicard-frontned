@@ -128,24 +128,24 @@ export default async function Footer() {
                 {qrSrc && (
                   qrLink
                     ? <a href={qrLink} target="_blank" rel="noreferrer" className="shrink-0">
-                        <Image src={qrSrc} alt="qr" width={200} height={200} className="rounded-lg bg-white p-1 h-auto w-auto max-h-14 border border-gray-200" />
+                        <Image src={qrSrc} alt="qr" width={200} height={200} className="rounded-lg bg-white p-1 h-auto w-auto max-h-20 md:max-h-24 border border-gray-200" />
                       </a>
-                    : <Image src={qrSrc} alt="qr" width={200} height={200} className="rounded-lg bg-white p-1 shrink-0 h-auto w-auto max-h-14 border border-gray-200" />
+                    : <Image src={qrSrc} alt="qr" width={200} height={200} className="rounded-lg bg-white p-1 shrink-0 h-auto w-auto max-h-20 md:max-h-24 border border-gray-200" />
                 )}
                 {footerItems.map((item, i) => {
                   const href = getHref(item);
-                  const el = <Image key={i} src={item.image} alt={`footer-item-${i}`} width={200} height={200} className="rounded-lg h-auto w-auto max-h-14" />;
+                  const el = <Image key={i} src={item.image} alt={`footer-item-${i}`} width={200} height={200} className="rounded-lg h-auto w-auto max-h-20 md:max-h-24" />;
                   return href
                     ? <a key={i} href={href} target="_blank" rel="noreferrer" className="shrink-0">{el}</a>
                     : <span key={i} className="shrink-0">{el}</span>;
                 })}
                 {img1 && (link1
-                  ? <a href={link1} target="_blank" rel="noreferrer" className="shrink-0"><Image src={img1} alt="img1" width={200} height={200} className="rounded-lg h-auto w-auto max-h-14" /></a>
-                  : <Image src={img1} alt="img1" width={200} height={200} className="rounded-lg shrink-0 h-auto w-auto max-h-14" />
+                  ? <a href={link1} target="_blank" rel="noreferrer" className="shrink-0"><Image src={img1} alt="img1" width={200} height={200} className="rounded-lg h-auto w-auto max-h-20 md:max-h-24" /></a>
+                  : <Image src={img1} alt="img1" width={200} height={200} className="rounded-lg shrink-0 h-auto w-auto max-h-20 md:max-h-24" />
                 )}
                 {img2 && (link2
-                  ? <a href={link2} target="_blank" rel="noreferrer" className="shrink-0"><Image src={img2} alt="img2" width={200} height={200} className="rounded-lg h-auto w-auto max-h-14" /></a>
-                  : <Image src={img2} alt="img2" width={200} height={200} className="rounded-lg shrink-0 h-auto w-auto max-h-14" />
+                  ? <a href={link2} target="_blank" rel="noreferrer" className="shrink-0"><Image src={img2} alt="img2" width={200} height={200} className="rounded-lg h-auto w-auto max-h-20 md:max-h-24" /></a>
+                  : <Image src={img2} alt="img2" width={200} height={200} className="rounded-lg shrink-0 h-auto w-auto max-h-20 md:max-h-24" />
                 )}
               </div>
             )}

@@ -2,39 +2,22 @@
 
 import { useState, useEffect } from "react";
 
-export default function SecretAdminPanel() {
-  const [maintenance, setMaintenance] = useState<boolean | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [msg, setMsg] = useState("");
+export default function MaintenanceControl() {
   const [authed, setAuthed] = useState(false);
+  const [maintenance, setMaintenance] = useState<boolean | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loginLoading, setLoginLoading] = useState(false);
   const [loginErr, setLoginErr] = useState("");
-
-  const fetchStatus = async () => {
-    const res = await fetch("/api/maintenance");
-    if (res.ok) {
-      const d = await res.json();
-      setMaintenance(d.maintenance);
-    } else {
-      setMaintenance(null);
-    }
-  };
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [toggleLoading, setToggleLoading] = useState(false);
+  const [msg, setMsg] = useState("");
 
   useEffect(() => {
-    // Try fetching status — if it works, we already have a valid session
-    fetch("/api/maintenance").then(async (r) => {
+    fetch("/api/maintenance/status", { credentials: "include" }).then(async (r) => {
       if (r.ok) {
         const d = await r.json();
         setMaintenance(d.maintenance);
         setAuthed(true);
-        // Grant bypass cookie so admin can browse while maintenance is on
-        fetch("/api/maintenance", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({}),
-        });
       }
     });
   }, []);
@@ -50,14 +33,14 @@ export default function SecretAdminPanel() {
     });
     const data = await res.json();
     if (data.success) {
+      // grant bypass cookie
+      await fetch("/api/maintenance/bypass", { method: "POST", credentials: "include" });
+      const s = await fetch("/api/maintenance/status", { credentials: "include" });
+      if (s.ok) {
+        const d = await s.json();
+        setMaintenance(d.maintenance);
+      }
       setAuthed(true);
-      await fetchStatus();
-      // Grant bypass cookie
-      fetch("/api/maintenance", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
-      });
     } else {
       setLoginErr(data.error || "بيانات غير صحيحة");
     }
@@ -65,12 +48,13 @@ export default function SecretAdminPanel() {
   };
 
   const toggle = async () => {
-    setLoading(true);
+    setToggleLoading(true);
     setMsg("");
-    const res = await fetch("/api/maintenance", {
+    const res = await fetch("/api/maintenance/toggle", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ enabled: !maintenance }),
+      credentials: "include",
     });
     const data = await res.json();
     if (data.success) {
@@ -79,14 +63,14 @@ export default function SecretAdminPanel() {
     } else {
       setMsg("❌ " + (data.error || "حدث خطأ"));
     }
-    setLoading(false);
+    setToggleLoading(false);
   };
 
   return (
     <div dir="rtl" className="min-h-screen flex items-center justify-center bg-slate-900 text-white px-4">
       <div className="bg-slate-800 rounded-2xl p-8 w-full max-w-sm text-center shadow-2xl">
-        <h1 className="text-2xl font-bold mb-2">لوحة التحكم السرية</h1>
-        <p className="text-slate-400 text-sm mb-6">التحكم في وضع الصيانة</p>
+        <h1 className="text-2xl font-bold mb-2">التحكم في الصيانة</h1>
+        <p className="text-slate-400 text-sm mb-6">صفحة سرية للأدمن فقط</p>
 
         {!authed ? (
           <form onSubmit={login} className="space-y-3 text-right">
@@ -136,17 +120,17 @@ export default function SecretAdminPanel() {
 
             <button
               onClick={toggle}
-              disabled={loading || maintenance === null}
+              disabled={toggleLoading || maintenance === null}
               className={`w-full py-3 rounded-xl font-bold text-sm transition-all ${
                 maintenance ? "bg-green-600 hover:bg-green-500" : "bg-red-600 hover:bg-red-500"
               } disabled:opacity-50`}
             >
-              {loading ? "جاري..." : maintenance ? "تشغيل الموقع" : "تفعيل الصيانة"}
+              {toggleLoading ? "جاري..." : maintenance ? "تشغيل الموقع" : "تفعيل الصيانة"}
             </button>
 
             {msg && <p className="mt-4 text-sm text-slate-300">{msg}</p>}
 
-            <p className="mt-6 text-xs text-slate-600">
+            <p className="mt-6 text-xs text-slate-500">
               أنت تتصفح الموقع بشكل طبيعي حتى لو الصيانة مفعّلة
             </p>
           </>
