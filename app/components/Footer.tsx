@@ -56,25 +56,25 @@ export default async function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
 
           {/* Brand */}
-          <div className="flex flex-col gap-5">
-            <Image src="/logo-re.webp" alt="logo" width={90} height={90} className="object-contain" />
+          <div className="flex flex-col gap-4">
+            <Image src="/logo-re.webp" alt="logo" width={72} height={72} className="object-contain" />
             <p className="text-sm leading-7 text-gray-600">
               شرائح اتصال وإنترنت بأسعار منافسة، مع خدمة سريعة وآمنة ودعم عملاء مميز. ثقتكم غايتنا وخدمتكم أولويتنا
             </p>
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2">
               <a href="https://qr.saudibusiness.gov.sa/viewcr?nCrNumber=qjCeot5eoqF+DgXufLJovw==" target="_blank" rel="noreferrer"
-                className="flex items-center gap-3 group">
-                <Image src="/commerce.webp" alt="سجل تجاري" width={44} height={44} className="object-contain rounded-lg" />
+                className="flex items-center gap-2 group">
+                <Image src="/commerce.webp" alt="سجل تجاري" width={36} height={36} className="object-contain rounded-md shrink-0" />
                 <div className="flex flex-col">
-                  <span className="text-sm font-semibold text-black group-hover:underline">السجل التجاري</span>
+                  <span className="text-xs font-semibold text-black group-hover:underline">السجل التجاري</span>
                   <span className="text-xs text-gray-500 font-mono">7054930313</span>
                 </div>
               </a>
               <a href="https://eauthenticate.saudibusiness.gov.sa/inquiry" target="_blank" rel="noreferrer"
-                className="flex items-center gap-3 group">
-                <Image src="/work.webp" alt="شهادة توثيق" width={44} height={44} className="object-contain rounded-lg" />
+                className="flex items-center gap-2 group">
+                <Image src="/work.webp" alt="شهادة توثيق" width={36} height={36} className="object-contain rounded-md shrink-0" />
                 <div className="flex flex-col">
-                  <span className="text-sm font-semibold text-black group-hover:underline">شهادة توثيق</span>
+                  <span className="text-xs font-semibold text-black group-hover:underline">شهادة توثيق</span>
                   <span className="text-xs text-gray-500 font-mono">0000315375</span>
                 </div>
               </a>
