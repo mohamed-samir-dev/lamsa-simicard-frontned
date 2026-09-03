@@ -19,7 +19,7 @@ export default function MaintenancePage() {
           style={{ animation: "fadeIn 0.7s ease both" }}
         >
           <Image
-            src="/Maintenance Animation.svg"
+            src="/maintenance-animation.svg"
             alt="صيانة"
             width={320}
             height={320}
