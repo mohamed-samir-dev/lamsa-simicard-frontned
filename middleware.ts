@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 const ADMIN_HOST = process.env.ADMIN_HOST || 'lamsa-simicard-frontned-production.up.railway.app';
-const BACKEND = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'https://backend-sahlnaha-simcard-production.up.railway.app';
+const BACKEND = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'https://lamsa-simicard-backend-production.up.railway.app';
 
 export async function middleware(request: NextRequest) {
   const { pathname, hostname } = request.nextUrl;
