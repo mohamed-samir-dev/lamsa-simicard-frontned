@@ -1,12 +1,10 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// الدومين الأصلي — بيطبق عليه الصيانة
-const PUBLIC_HOST = process.env.PUBLIC_HOST || 'basmathatify.com';
-// الدومين الخاص بيك — يعدي دايماً بدون صيانة
 const ADMIN_HOST = process.env.ADMIN_HOST || 'lamsa-simicard-frontned-production.up.railway.app';
+const BACKEND = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'https://backend-sahlnaha-simcard-production.up.railway.app';
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname, hostname } = request.nextUrl;
 
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
@@ -16,27 +14,33 @@ export function middleware(request: NextRequest) {
   requestHeaders.set('x-nonce', nonce);
   requestHeaders.set('Content-Security-Policy', cspHeader);
 
-  // دومين Railway الخاص بيك — يعدي دايماً بدون صيانة
-  if (hostname === ADMIN_HOST || hostname === 'localhost') {
+  // دومين Railway الخاص بيك أو localhost — يعدي دايماً بدون صيانة
+  if (hostname === ADMIN_HOST || hostname === 'localhost' || isDev) {
     const response = NextResponse.next({ request: { headers: requestHeaders } });
     setSecurityHeaders(response, cspHeader);
     return response;
   }
 
-  // الدومين الأصلي basmathatify.com — بيطبق الصيانة
-  if (hostname === PUBLIC_HOST) {
-    const maintenanceMode = request.cookies.get('maintenance_on')?.value === '1';
+  // الدومين الأصلي basmathatify.com — تحقق من الصيانة في الـ DB
+  const isStatic = pathname.startsWith('/_next') || pathname.startsWith('/favicon') || pathname.startsWith('/site.webmanifest');
+  const isAllowed = pathname.startsWith('/maintenance') || pathname.startsWith('/api/');
 
-    if (maintenanceMode) {
-      const isStatic = pathname.startsWith('/_next') || pathname.startsWith('/favicon') || pathname.startsWith('/site.webmanifest');
-      const isAllowed = pathname.startsWith('/maintenance') || pathname.startsWith('/api/');
-
-      if (!isStatic && !isAllowed) {
-        const maintenanceUrl = new URL('/maintenance', request.url);
-        const response = NextResponse.redirect(maintenanceUrl);
-        response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
-        return response;
+  if (!isStatic && !isAllowed) {
+    try {
+      const r = await fetch(`${BACKEND}/api/admin/maintenance/public`, {
+        next: { revalidate: 30 },
+      } as RequestInit);
+      if (r.ok) {
+        const data = await r.json();
+        if (data.maintenance === true) {
+          const url = new URL('/maintenance', request.url);
+          const response = NextResponse.redirect(url);
+          response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+          return response;
+        }
       }
+    } catch {
+      // لو الباكند مش شغال، يعدي عادي
     }
   }
 
