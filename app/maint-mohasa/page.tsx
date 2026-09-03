@@ -61,8 +61,7 @@ export default function MaintenanceControl() {
     const data = await res.json();
     if (data.success) {
       setMaintenance(data.maintenance);
-      setMsg(data.maintenance ? "✅ وضع الصيانة مفعّل" : "✅ الموقع شغّال الآن");
-      setTimeout(() => window.location.reload(), 1500);
+      setMsg(data.maintenance ? "✅ وضع الصيانة مفعّل على basmathatify.com" : "✅ الموقع شغّال الآن");
     } else {
       setMsg("❌ " + (data.error || "حدث خطأ"));
     }
