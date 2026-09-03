@@ -37,7 +37,7 @@ function buildCsp(nonce: string, isDev: boolean): string {
     font-src 'self' https://fonts.gstatic.com;
     connect-src 'self' http://localhost:5000 https://*.railway.app https://*.render.com https://*.onrender.com https://sentry.io https://www.google-analytics.com https://maps.googleapis.com https://nominatim.openstreetmap.org;
     frame-src 'self' https://www.google.com;
-    object-src 'none';
+    object-src 'self';
     base-uri 'self';
     form-action 'self';
     frame-ancestors 'none';

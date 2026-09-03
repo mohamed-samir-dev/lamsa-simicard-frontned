@@ -10,11 +10,13 @@ export async function GET(req: NextRequest) {
   if (!res.ok) return new NextResponse("failed", { status: res.status });
 
   const body = await res.arrayBuffer();
+  const contentType = res.headers.get("content-type") || "application/pdf";
 
   return new NextResponse(body, {
     headers: {
-      "Content-Type": "application/pdf",
+      "Content-Type": contentType,
       "Content-Disposition": "inline",
+      "Cache-Control": "public, max-age=3600",
     },
   });
 }
