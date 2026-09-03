@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const ADMIN_HOST = process.env.ADMIN_HOST || 'lamsa-simicard-frontned-production.up.railway.app';
+const BACKEND = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'https://lamsa-simicard-backend-production.up.railway.app';
 
 export async function middleware(request: NextRequest) {
-  const { pathname, hostname } = request.nextUrl;
+  const { pathname } = request.nextUrl;
 
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
   const isDev = process.env.NODE_ENV === 'development';
@@ -24,15 +24,24 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/api/');
 
   if (!isStatic && !isExempt) {
-    const maintenanceOn = request.cookies.get('maintenance_on')?.value === '1';
-    if (maintenanceOn) {
-      // الأدمن المسجّل يعدي عادي
-      const adminToken = request.cookies.get('admin_token')?.value;
-      if (!adminToken) {
-        const url = new URL('/maintenance', request.url);
-        const res = NextResponse.redirect(url);
-        res.headers.set('Cache-Control', 'no-store');
-        return res;
+    // الأدمن المسجّل يعدي دايماً
+    const adminToken = request.cookies.get('admin_token')?.value;
+    if (!adminToken) {
+      try {
+        const r = await fetch(`${BACKEND}/api/admin/maintenance/public`, {
+          next: { revalidate: 30 },
+        } as RequestInit);
+        if (r.ok) {
+          const data = await r.json();
+          if (data.maintenance === true) {
+            const url = new URL('/maintenance', request.url);
+            const res = NextResponse.redirect(url);
+            res.headers.set('Cache-Control', 'no-store');
+            return res;
+          }
+        }
+      } catch {
+        // لو الباكند مش شغال، يعدي عادي
       }
     }
   }
