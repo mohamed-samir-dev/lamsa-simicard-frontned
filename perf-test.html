@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>قياس وقت تحميل الداتا - الصفحة الرئيسية</title>
+  <style>
+    body { font-family: monospace; padding: 20px; background: #0f0f0f; color: #e0e0e0; }
+    h2 { color: #B5854A; }
+    .result { margin: 8px 0; padding: 10px 14px; border-radius: 8px; background: #1a1a1a; border-left: 3px solid #333; }
+    .result.fast  { border-color: #4caf50; }
+    .result.mid   { border-color: #ff9800; }
+    .result.slow  { border-color: #f44336; }
+    .label { font-weight: bold; color: #B5854A; }
+    .time  { float: left; font-size: 1.1em; }
+    .status { font-size: 0.85em; color: #888; margin-top: 4px; }
+    #summary { margin-top: 20px; padding: 14px; background: #1a1a1a; border-radius: 10px; border: 1px solid #B5854A44; }
+    button { background: #B5854A; color: #fff; border: none; padding: 10px 24px; border-radius: 8px; cursor: pointer; font-size: 1em; margin-bottom: 20px; }
+    button:hover { background: #c8a375; }
+    #log { margin-top: 10px; font-size: 0.8em; color: #666; }
+  </style>
+</head>
+<body>
+  <h2>⏱ قياس وقت تحميل الداتا - الصفحة الرئيسية</h2>
+  <p style="color:#888; font-size:0.9em">تأكد إن السيرفر شغال على <code>localhost:3000</code> و <code>localhost:5000</code></p>
+  <button onclick="runTests()">▶ ابدأ القياس</button>
+  <div id="results"></div>
+  <div id="summary"></div>
+  <div id="log"></div>
+
+  <script>
+    const PRODUCT_IDS = [
+      "6a943492832465e62427be05",
+      "6a9437e6cd7da0bf04e86916",
+      "6a9430ba2f39401999e29c50",
+      "6a94389df64d29e186524b77",
+    ];
+
+    const ENDPOINTS = [
+      {
+        label: "Company (SSR - backend مباشر)",
+        url: "http://localhost:5000/api/admin/company/public",
+        note: "getCompany() في page.tsx"
+      },
+      {
+        label: "Brand Home Settings",
+        url: "/api/admin/brands/home-settings",
+        note: "HomeCategorySections"
+      },
+      {
+        label: "Reviews",
+        url: "/api/reviews",
+        note: "CustomerReviews"
+      },
+      ...PRODUCT_IDS.map((id, i) => ({
+        label: `Product #${i + 1} (Most Demanded)`,
+        url: `/api/products/${id}`,
+        note: "MostDemandedSection"
+      })),
+    ];
+
+    function colorClass(ms) {
+      if (ms < 300) return "fast";
+      if (ms < 800) return "mid";
+      return "slow";
+    }
+
+    function emoji(ms) {
+      if (ms < 300) return "✅";
+      if (ms < 800) return "⚠️";
+      return "🔴";
+    }
+
+    async function measureFetch(url) {
+      const start = performance.now();
+      try {
+        const res = await fetch(url, { cache: "no-store" });
+        const ms = Math.round(performance.now() - start);
+        let size = "—";
+        try {
+          const text = await res.text();
+          size = (text.length / 1024).toFixed(1) + " KB";
+        } catch {}
+        return { ms, status: res.status, size, error: null };
+      } catch (e) {
+        const ms = Math.round(performance.now() - start);
+        return { ms, status: null, size: "—", error: e.message };
+      }
+    }
+
+    async function runTests() {
+      const resultsEl = document.getElementById("results");
+      const summaryEl = document.getElementById("summary");
+      const logEl = document.getElementById("log");
+      resultsEl.innerHTML = "<p style='color:#888'>جاري القياس...</p>";
+      summaryEl.innerHTML = "";
+      logEl.innerHTML = "";
+
+      const allResults = [];
+
+      // Run all in parallel (like the real page does)
+      const parallelStart = performance.now();
+      const promises = ENDPOINTS.map(ep => measureFetch(ep.url));
+      const timings = await Promise.all(promises);
+      const totalParallel = Math.round(performance.now() - parallelStart);
+
+      resultsEl.innerHTML = "";
+
+      ENDPOINTS.forEach((ep, i) => {
+        const t = timings[i];
+        allResults.push({ ...ep, ...t });
+
+        const div = document.createElement("div");
+        div.className = `result ${t.error ? "slow" : colorClass(t.ms)}`;
+        div.innerHTML = `
+          <span class="label">${ep.label}</span>
+          <span class="time">${emoji(t.ms)} ${t.ms} ms</span>
+          <div class="status">
+            ${t.error
+              ? `<span style="color:#f44336">❌ خطأ: ${t.error}</span>`
+              : `HTTP ${t.status} · حجم الرد: ${t.size}`
+            }
+            <br/><span style="color:#555">${ep.note} — ${ep.url}</span>
+          </div>
+        `;
+        resultsEl.appendChild(div);
+      });
+
+      const successful = allResults.filter(r => !r.error);
+      const maxMs = successful.length ? Math.max(...successful.map(r => r.ms)) : 0;
+      const avgMs = successful.length ? Math.round(successful.reduce((s, r) => s + r.ms, 0) / successful.length) : 0;
+      const slowest = successful.sort((a, b) => b.ms - a.ms)[0];
+
+      summaryEl.innerHTML = `
+        <h3 style="color:#B5854A; margin:0 0 10px">📊 ملخص</h3>
+        <div>⏱ وقت التحميل الكلي (parallel): <strong style="color:#B5854A">${totalParallel} ms</strong></div>
+        <div>📈 متوسط وقت الـ endpoints: <strong>${avgMs} ms</strong></div>
+        <div>🐢 أبطأ endpoint: <strong style="color:${maxMs > 800 ? '#f44336' : '#ff9800'}">${slowest?.label} (${maxMs} ms)</strong></div>
+        <div style="margin-top:8px; font-size:0.85em; color:#666">
+          ✅ أقل من 300ms = سريع &nbsp;|&nbsp; ⚠️ 300-800ms = مقبول &nbsp;|&nbsp; 🔴 أكثر من 800ms = بطيء
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>
