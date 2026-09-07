@@ -116,7 +116,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       )}
-      <ProductPageClient id={id} />
+      <ProductPageClient id={id} initialProduct={product} />
     </>
   );
 }

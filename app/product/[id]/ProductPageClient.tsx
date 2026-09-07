@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { IoArrowForward, IoShareSocial, IoHomeOutline, IoChevronBack, IoCartOutline } from "react-icons/io5";
@@ -13,71 +13,14 @@ import ProductDetails from "./components/ProductDetails";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
-type FetchState = "loading" | "not_found" | "error" | "done";
-
-export default function ProductPageClient({ id }: { id: string }) {
+export default function ProductPageClient({ id, initialProduct }: { id: string; initialProduct: Product | null }) {
   const router = useRouter();
-  const [product, setProduct] = useState<Product | null>(null);
-  const [state, setState] = useState<FetchState>("loading");
-  const [retryKey, setRetryKey] = useState(0);
   const [addedToCart, setAddedToCart] = useState(false);
   const addItem = useCartStore((s) => s.addItem);
 
-  useEffect(() => {
-    if (!id) return;
-    setState("loading");
-    setProduct(null);
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15000);
+  const product = initialProduct;
 
-    fetch(`/api/products/${id}`, { signal: controller.signal })
-      .then(async (r) => {
-        if (r.status === 404) { setState("not_found"); return; }
-        if (!r.ok) { setState("error"); return; }
-        const data = await r.json();
-        setProduct(data);
-        setState("done");
-      })
-      .catch((e) => {
-        if (e.name === "AbortError") return;
-        console.error("Product fetch error:", e);
-        setState("error");
-      })
-      .finally(() => clearTimeout(timeout));
-
-    return () => { clearTimeout(timeout); controller.abort(); };
-  }, [id, retryKey]);
-
-  if (state === "loading")
-    return (
-      <main className="min-h-screen bg-white" dir="rtl">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-12">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="aspect-square rounded-2xl animate-pulse bg-gray-100" />
-            <div className="space-y-4 pt-4">
-              {[80, 60, 40, 90, 50].map((w, i) => (
-                <div key={i} className="h-4 rounded-full animate-pulse bg-gray-100" style={{ width: `${w}%` }} />
-              ))}
-            </div>
-          </div>
-        </div>
-      </main>
-    );
-
-  if (state === "error")
-    return (
-      <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-4">
-        <p className="text-gray-500 text-lg">حدث خطأ أثناء تحميل المنتج</p>
-        <button
-          onClick={() => setRetryKey((k) => k + 1)}
-          className="px-6 py-2 rounded-xl bg-[#B5854A] text-white font-bold text-sm"
-        >
-          إعادة المحاولة
-        </button>
-      </div>
-    );
-
-  if (state === "not_found" || !product)
+  if (!product)
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <p className="text-gray-400 text-lg">المنتج غير موجود</p>
